@@ -1,7 +1,7 @@
 {
-  "name": "weprtc-peer",
+  "name": "electron-explore",
   "version": "0.1.0",
-  "description": "",
+  "description": "To explore the development of electron application",
   "scripts": {
     "prepare": "husky install",
     "start": "node ./script/dev",
@@ -44,6 +44,7 @@
   "devDependencies": {
     "@commitlint/cli": "^15.0.0",
     "@commitlint/config-conventional": "^15.0.0",
+    "@fujia/spawn": "^1.0.1",
     "@types/jest": "^27.5.1",
     "@typescript-eslint/eslint-plugin": "^5.23.0",
     "@typescript-eslint/parser": "^5.23.0",

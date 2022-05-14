@@ -26,7 +26,7 @@ if (isDev) {
 
 class App {
   win1!: BrowserWindow;
-  win2!: BrowserWindow;
+  // win2!: BrowserWindow;
 
   createWindow() {
     protocol.registerBufferProtocol('app', (request, response) => {
@@ -84,17 +84,17 @@ class App {
       this.win1.loadURL(`http://localhost:${process.env.WEB_PORT}/`);
     }
 
-    this.win2 = new BrowserWindow({
-      ...config,
-      x: 100,
-      y: 100,
-    });
+    // this.win2 = new BrowserWindow({
+    //   ...config,
+    //   x: 100,
+    //   y: 100,
+    // });
 
-    if (app.isPackaged) {
-      this.win2.loadURL('app://./index.html');
-    } else {
-      this.win2.loadURL(`http://localhost:${process.env.WEB_PORT}/`);
-    }
+    // if (app.isPackaged) {
+    //   this.win2.loadURL('app://./index.html');
+    // } else {
+    //   this.win2.loadURL(`http://localhost:${process.env.WEB_PORT}/`);
+    // }
   }
 
   constructor() {

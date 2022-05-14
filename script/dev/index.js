@@ -1,6 +1,7 @@
 const os = require('os');
 const fs = require('fs');
-const { spawn } = require('child_process');
+// const { spawn } = require('child_process');
+const { spawn } = require('@fujia/spawn');
 const vite = require('vite');
 const vue = require('@vitejs/plugin-vue');
 const path = require('path');
