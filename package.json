@@ -31,7 +31,7 @@
     ]
   },
   "lint-staged": {
-    "*.{vue}": "eslint",
+    "*.vue": "eslint",
     "*.{ts,scss,vue}": "prettier"
   },
   "dependencies": {
