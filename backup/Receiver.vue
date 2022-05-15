@@ -5,24 +5,18 @@
       <input class="input" v-model="code" placeholder="请输入邀请码" />
       <button class="btn" @click="handleCreateChannel">创建通道</button>
     </div>
-    <!-- <button @click="handleReceiveData">开始接收</button> -->
+    <button @click="handleReceiveData">开始接收</button>
   </div>
 </template>
 
 <script lang="ts">
-import { WriteStream } from 'original-fs';
 import Peer, { DataConnection } from 'peerjs';
 import { ref, defineComponent } from 'vue';
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
 
-import { genClientId } from '../utils';
-import { ChannelMessage } from './interface';
-
 let peer: Peer;
-let conn: DataConnection;
-let wStream: WriteStream | null;
 
 export default defineComponent({
   setup() {
@@ -110,95 +104,83 @@ export default defineComponent({
         return;
       }
 
-      this.handleConnect();
+      this.handleConnect(this.code);
     },
-    handleConnect() {
+    handleConnect(channelId: string) {
       try {
-        const clientId = genClientId();
-
-        peer = new Peer(clientId, {
+        peer = new Peer(channelId, {
           host: '192.168.31.103',
           port: 9000,
           path: '/peer/webrtc',
-          debug: 2,
+          debug: 3,
         });
 
-        conn = peer.connect(this.code);
-
-        conn.on('open', () => {
+        peer.on('connection', (conn: DataConnection) => {
           const msg = {
-            msgName: 'readyToReceive',
+            msgName: 'connectSuccessful',
             sendTime: Date.now(),
           };
           conn.send(JSON.stringify(msg));
         });
-        // peer.on('connection', (conn: DataConnection) => {
-        //   const msg = {
-        //     msgName: 'connectSuccessful',
-        //     sendTime: Date.now(),
-        //   };
-        //   conn.send(JSON.stringify(msg));
-        // });
-        conn.on('data', (data) => this.handleReceiveData(data));
       } catch (error) {
         console.log(error);
       }
     },
 
-    async handleReceiveData(data: string) {
+    handleReceiveData() {
       const fileSavePath = ref(path.join(os.homedir(), 'Desktop'));
+      let wStream: any;
 
-      const parseData: ChannelMessage = JSON.parse(data);
+      const openWriteStream = async (): Promise<any> => {
+        return new Promise((resolve, reject) => {
+          console.log('openWriteStream file', fileSavePath.value);
+          const wStream = fs.createWriteStream(fileSavePath.value);
 
-      if (parseData.msgName === 'beginSendFile') {
-        fileSavePath.value = path.join(fileSavePath.value, Date.now().toString() + `_${parseData.fileName}`);
+          wStream.on('open', () => {
+            console.log('Receiver opening...');
+            resolve(wStream);
+          });
 
-        wStream = await this.openWriteStream(fileSavePath.value);
+          wStream.on('error', (err: any) => {
+            console.error(err);
+            reject('create write stream error...');
+          });
 
-        const msg = {
-          msgName: 'readyToReceiveFile',
-          sendTime: Date.now(),
-        };
-
-        conn.send(JSON.stringify(msg));
-      } else if (parseData.msgName === 'fileSendFinish') {
-        wStream?.end();
-        wStream = null;
-        // wStream.close();
-      } else if (parseData.msgName === 'sendChunk') {
-        const buffer = Buffer.from(parseData.chunk as string, 'hex');
-
-        if (wStream) {
-          wStream?.write(buffer);
-        }
-
-        const msg = {
-          msgName: 'chunkReady',
-          sendTime: Date.now(),
-        };
-
-        conn.send(JSON.stringify(msg));
-      }
-    },
-
-    async openWriteStream(filePath: string): Promise<any> {
-      return new Promise((resolve, reject) => {
-        console.log('openWriteStream file', filePath);
-        const writeFileStream = fs.createWriteStream(filePath);
-
-        writeFileStream.on('open', () => {
-          console.log('Receiver opening...');
-          resolve(writeFileStream);
+          wStream.on('finish', () => {
+            console.log('write finished', true);
+          });
         });
+      };
 
-        writeFileStream.on('error', (err: any) => {
-          console.error(err);
-          reject('create write stream error...');
-        });
+      peer.on('connection', (conn: DataConnection) => {
+        conn.on('data', async (data) => {
+          data = JSON.parse(data);
 
-        writeFileStream.on('finish', () => {
-          console.log('write finished', true);
-          // writeFileStream = null;
+          if (data.msgName === 'beginSendFile') {
+            fileSavePath.value = path.join(fileSavePath.value, Date.now().toString() + `_${data.fileName}`);
+
+            wStream = await openWriteStream();
+
+            const msg = {
+              msgName: 'readyToReceiveFile',
+              sendTime: Date.now(),
+            };
+
+            conn.send(JSON.stringify(msg));
+          } else if (data.msgName === 'fileSendFinish') {
+            wStream.end();
+          } else if (data.msgName === 'sendChunk') {
+            const buffer = Buffer.from(data.chunk, 'hex');
+
+            wStream.write(buffer);
+
+            const msg = {
+              msgName: 'chunkReady',
+              sendTime: Date.now(),
+            };
+
+            conn.send(JSON.stringify(msg));
+          }
         });
       });
     },

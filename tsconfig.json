@@ -4,12 +4,16 @@
     "module": "esnext",
     "moduleResolution": "node",
     "strict": true,
+    "pretty": true,
+    "lib": ["ESNext", "DOM"],
     "jsx": "preserve",
     "sourceMap": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
+    "allowJs": true,
+    "baseUrl": "./src",
     "types": ["vite/client"]
   },
-  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "exclude": ["release", "node_modules"],
+  "include": ["src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"]
 }

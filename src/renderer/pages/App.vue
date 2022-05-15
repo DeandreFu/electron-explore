@@ -1,7 +1,10 @@
 <template>
   <div>
-    <div class="menu" @click="goto('sender')">文件发送客户端</div>
-    <div class="menu" @click="goto('receiver')">文件接收客户端</div>
+    <header>
+      <router-link class="menu" to="/">首页</router-link>
+      <router-link class="menu" to="/sender">文件发送客户端</router-link>
+      <router-link class="menu" to="/receiver">文件接收客户端</router-link>
+    </header>
   </div>
   <router-view />
 </template>
@@ -29,9 +32,24 @@ export default {
 
 <style lang="scss">
 .menu {
-  color: blue;
+  font-size: 18;
   cursor: pointer;
   display: inline-block;
-  padding: 0px 12px;
+  padding: 0px 16px;
+  color: #2a3a4a;
+  text-decoration: none;
+
+  &:focus {
+    color: #4082f3;
+  }
+
+  &:hover {
+    color: #4082f3;
+  }
+}
+
+.active-link {
+  color: #4082f3;
+  font-weight: bold;
 }
 </style>
