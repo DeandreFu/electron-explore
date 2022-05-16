@@ -7,6 +7,7 @@
     </header>
     <div class="wrapper">
       <main class="main">
+        <video class="video" ref="myVideo"></video>
         <video class="video" ref="video"></video>
         <div class="media-operate">
           <button class="media-btn">结束</button>
@@ -145,7 +146,7 @@ export default defineComponent({
         host: '192.168.31.103',
         port: 9000,
         path: '/peer/webrtc',
-        debug: 3,
+        debug: 2,
       });
 
       peer.on('open', (id) => {
@@ -163,18 +164,24 @@ export default defineComponent({
         console.log(call);
         console.log('accept the calling');
         const mStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
+          audio: false,
           video: {
             width: 1920,
             height: 1080,
           },
         });
+        const myVideoEle = this.$refs.myVideo as HTMLVideoElement;
+        myVideoEle.srcObject = mStream;
+        myVideoEle.onloadedmetadata = () => {
+          myVideoEle.play();
+        };
         if (mStream) {
           console.log('answer...');
           call.answer(mStream);
         }
 
         call.on('media', (stream: MediaStream) => {
+          console.log('listening media event...');
           const videoEle = this.$refs.video as HTMLVideoElement;
           videoEle.srcObject = stream;
           videoEle.onloadedmetadata = () => {

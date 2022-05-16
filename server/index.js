@@ -11,7 +11,7 @@ let clientCount = 0;
 app.get('/', (req, res, next) => res.send('Hello WebRTC!'));
 
 const server = app.listen(PORT, () => {
-  console.log(`The service is running on http://0.0.0.0:${PORT}`);
+  console.log(`The service is running on http://192.168.31.103:${PORT}`);
 });
 
 const peerServer = ExpressPeerServer(server, {
