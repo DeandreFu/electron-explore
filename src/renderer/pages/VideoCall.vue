@@ -173,9 +173,9 @@ export default defineComponent({
         // });
         // call.answer(mStream);
         console.log('Call client is listening call event');
-        call.on('stream', (media: MediaStream) => {
+        call.on('stream', (stream: MediaStream) => {
           const videoEle = this.$refs.video as HTMLVideoElement;
-          videoEle.srcObject = media;
+          videoEle.srcObject = stream;
           videoEle.onloadedmetadata = () => {
             videoEle.play();
           };

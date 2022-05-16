@@ -163,7 +163,7 @@ export default defineComponent({
         console.log(call);
         console.log('accept the calling');
         const mStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
+          audio: false,
           video: {
             width: 1920,
             height: 1080,
@@ -234,6 +234,7 @@ export default defineComponent({
     .main {
       flex: 1;
       position: relative;
+      font-size: 0;
 
       .video {
         width: 100%;
