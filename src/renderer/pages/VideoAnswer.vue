@@ -7,7 +7,6 @@
     </header>
     <div class="wrapper">
       <main class="main">
-        <video class="video" ref="myVideo"></video>
         <video class="video" ref="video"></video>
         <div class="media-operate">
           <button class="media-btn">结束</button>
@@ -164,23 +163,18 @@ export default defineComponent({
         console.log(call);
         console.log('accept the calling');
         const mStream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
+          audio: true,
           video: {
             width: 1920,
             height: 1080,
           },
         });
-        const myVideoEle = this.$refs.myVideo as HTMLVideoElement;
-        myVideoEle.srcObject = mStream;
-        myVideoEle.onloadedmetadata = () => {
-          myVideoEle.play();
-        };
         if (mStream) {
           console.log('answer...');
           call.answer(mStream);
         }
 
-        call.on('media', (stream: MediaStream) => {
+        call.on('stream', (stream: MediaStream) => {
           console.log('listening media event...');
           const videoEle = this.$refs.video as HTMLVideoElement;
           videoEle.srcObject = stream;

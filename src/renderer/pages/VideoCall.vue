@@ -7,7 +7,6 @@
     </header>
     <div class="wrapper">
       <main class="main">
-        <video class="video" ref="myVideo"></video>
         <video class="video" ref="video"></video>
         <div class="media-operate">
           <button class="media-btn" @click="handleVideoCall">视频通话</button>
@@ -79,17 +78,12 @@ export default defineComponent({
         // const availableDevices = await navigator.mediaDevices.enumerateDevices();
         // console.log(availableDevices);
         const mStream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
+          audio: true,
           video: {
             width: 1920,
             height: 1080,
           },
         });
-        const videoEle = this.$refs.myVideo as HTMLVideoElement;
-        videoEle.srcObject = mStream;
-        videoEle.onloadedmetadata = () => {
-          videoEle.play();
-        };
         if (remotePeerId && mStream) {
           console.log('calling ' + remotePeerId);
           peer.call(remotePeerId, mStream);
@@ -179,7 +173,7 @@ export default defineComponent({
         // });
         // call.answer(mStream);
         console.log('Call client is listening call event');
-        call.on('media', (media: MediaStream) => {
+        call.on('stream', (media: MediaStream) => {
           const videoEle = this.$refs.video as HTMLVideoElement;
           videoEle.srcObject = media;
           videoEle.onloadedmetadata = () => {
