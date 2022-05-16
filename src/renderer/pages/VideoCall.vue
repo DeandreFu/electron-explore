@@ -164,14 +164,14 @@ export default defineComponent({
       });
 
       peer.on('call', async (call: MediaConnection) => {
-        // const mStream = await navigator.mediaDevices.getUserMedia({
-        //   audio: true,
-        //   video: {
-        //     width: 1920,
-        //     height: 1080,
-        //   },
-        // });
-        // call.answer(mStream);
+        const mStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: {
+            width: 1920,
+            height: 1080,
+          },
+        });
+        call.answer(mStream);
         console.log('Call client is listening call event');
         call.on('stream', (stream: MediaStream) => {
           const videoEle = this.$refs.video as HTMLVideoElement;
