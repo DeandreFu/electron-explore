@@ -7,7 +7,10 @@
     </header>
     <div class="wrapper">
       <main class="main">
-        <video class="video"></video>
+        <video class="video" ref="video"></video>
+        <div class="media-operate">
+          <button class="media-btn">结束</button>
+        </div>
       </main>
       <aside class="sidebar">
         <div class="news">
@@ -44,6 +47,7 @@ let peer: Peer;
 let conn: DataConnection;
 let initiatedPeer = false;
 let peerId: string;
+let remotePeerId: string;
 
 export default defineComponent({
   name: 'VideoAnswer',
@@ -110,6 +114,13 @@ export default defineComponent({
 
         conn.on('data', (data) => {
           console.log('Answer -> ', data);
+
+          if (data.type === 'signal' && data.content === 'connectSuccess') {
+            if (data.peerId) {
+              remotePeerId = data.peerId;
+            }
+          }
+
           if (data.type === 'message' && data.content) {
             this.news.push({
               content: data.content,
@@ -148,8 +159,28 @@ export default defineComponent({
         });
       });
 
-      peer.on('call', (call: MediaConnection) => {
-        // call.answer()
+      peer.on('call', async (call: MediaConnection) => {
+        console.log(call);
+        console.log('accept the calling');
+        const mStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: {
+            width: 1920,
+            height: 1080,
+          },
+        });
+        if (mStream) {
+          console.log('answer...');
+          call.answer(mStream);
+        }
+
+        call.on('media', (stream: MediaStream) => {
+          const videoEle = this.$refs.video as HTMLVideoElement;
+          videoEle.srcObject = stream;
+          videoEle.onloadedmetadata = () => {
+            videoEle.play();
+          };
+        });
       });
 
       peer.on('close', () => {
@@ -201,11 +232,32 @@ export default defineComponent({
     display: flex;
     .main {
       flex: 1;
+      position: relative;
 
       .video {
         width: 100%;
         height: 100%;
-        background: #f9f9f9;
+        background: #333;
+      }
+
+      .media-operate {
+        position: absolute;
+        bottom: 3.2rem;
+        left: 50%;
+        margin-left: -50%;
+        width: 100%;
+      }
+
+      .media-btn {
+        background-color: rgb(211, 14, 54);
+        color: #fff;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 1px solid #f9f9f9;
+        margin: 0 8px;
+        cursor: pointer;
+        overflow: hidden;
       }
     }
 

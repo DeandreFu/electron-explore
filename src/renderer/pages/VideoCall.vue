@@ -7,7 +7,11 @@
     </header>
     <div class="wrapper">
       <main class="main">
-        <video class="video"></video>
+        <video class="video" ref="video"></video>
+        <div class="media-operate">
+          <button class="media-btn" @click="handleVideoCall">视频通话</button>
+          <button class="media-btn" @click="handleAudioCall">语音通话</button>
+        </div>
       </main>
       <aside class="sidebar">
         <div class="news">
@@ -41,6 +45,7 @@ import { genClientId } from '../utils';
 
 let peer: Peer;
 let conn: DataConnection;
+let remotePeerId: string;
 
 export interface NewsItem {
   content: string;
@@ -67,6 +72,29 @@ export default defineComponent({
     }
   },
   methods: {
+    async handleVideoCall() {
+      try {
+        // if (!peer) return;
+        // const availableDevices = await navigator.mediaDevices.enumerateDevices();
+        // console.log(availableDevices);
+        const mStream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+          video: {
+            width: 1920,
+            height: 1080,
+          },
+        });
+        if (remotePeerId && mStream) {
+          console.log('calling ' + remotePeerId);
+          peer.call(remotePeerId, mStream);
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    handleAudioCall() {
+      //
+    },
     sendMsg() {
       console.log('sendMsg');
       if (!conn || !this.message) return;
@@ -113,6 +141,18 @@ export default defineComponent({
         conn = curConn;
         curConn.on('data', (data) => {
           console.log('Call -> ', data);
+          if (data.type === 'signal' && data.content === 'connectSuccess') {
+            console.log('Remote user connect successful.');
+
+            if (data.peerId) {
+              remotePeerId = data.peerId;
+              curConn.send({
+                type: 'signal',
+                content: 'connectSuccess',
+                peerId: this.code,
+              });
+            }
+          }
           if (data.type === 'message' && data.content) {
             this.news.push({
               content: data.content,
@@ -125,6 +165,14 @@ export default defineComponent({
 
       peer.on('call', (call: MediaConnection) => {
         // call.answer()
+        console.log('Call client is listening call event');
+        call.on('media', (media: MediaStream) => {
+          const videoEle = this.$refs.video as HTMLVideoElement;
+          videoEle.srcObject = media;
+          videoEle.onloadedmetadata = () => {
+            videoEle.play();
+          };
+        });
       });
 
       peer.on('close', () => {
@@ -170,11 +218,33 @@ export default defineComponent({
     display: flex;
     .main {
       flex: 1;
+      position: relative;
+      font-size: 0;
 
       .video {
         width: 100%;
         height: 100%;
-        background: #f9f9f9;
+        background: #333;
+      }
+
+      .media-operate {
+        position: absolute;
+        bottom: 3.2rem;
+        width: 100%;
+        left: 50%;
+        margin-left: -50%;
+      }
+
+      .media-btn {
+        background-color: rgb(211, 14, 54);
+        color: #fff;
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 1px solid #f9f9f9;
+        margin: 0 8px;
+        cursor: pointer;
+        overflow: hidden;
       }
     }
 
