@@ -160,10 +160,10 @@ export default defineComponent({
       });
 
       peer.on('call', async (call: MediaConnection) => {
-        console.log(call);
+        // console.log(call);
         console.log('accept the calling');
         const mStream = await navigator.mediaDevices.getUserMedia({
-          audio: false,
+          audio: true,
           video: {
             width: 1920,
             height: 1080,
@@ -172,6 +172,7 @@ export default defineComponent({
         if (mStream) {
           console.log('answer...');
           call.answer(mStream);
+          peer.call(remotePeerId, mStream);
         }
 
         call.on('stream', (stream: MediaStream) => {
