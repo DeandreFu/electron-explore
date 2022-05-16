@@ -85,7 +85,7 @@ class App {
     if (app.isPackaged) {
       this.win1.loadURL('app://./index.html');
     } else {
-      this.win1.loadURL(`http://localhost:${process.env.WEB_PORT}/#/sender`);
+      this.win1.loadURL(`http://localhost:${process.env.WEB_PORT}/#/call`);
     }
 
     this.win2 = new BrowserWindow({
@@ -97,7 +97,7 @@ class App {
     if (app.isPackaged) {
       this.win2.loadURL('app://./index.html');
     } else {
-      this.win2.loadURL(`http://localhost:${process.env.WEB_PORT}/#/receiver`);
+      this.win2.loadURL(`http://localhost:${process.env.WEB_PORT}/#/answer`);
     }
   }
 

@@ -13,6 +13,14 @@ const routes = [
     path: '/receiver',
     component: () => import('./pages/Receiver.vue'),
   },
+  {
+    path: '/call',
+    component: () => import('./pages/VideoCall.vue'),
+  },
+  {
+    path: '/answer',
+    component: () => import('./pages/VideoAnswer.vue'),
+  },
 ];
 
 export const router = createRouter({
