@@ -78,7 +78,7 @@ export default defineComponent({
         // const availableDevices = await navigator.mediaDevices.enumerateDevices();
         // console.log(availableDevices);
         const mStream = await navigator.mediaDevices.getUserMedia({
-          audio: true,
+          audio: false,
           video: {
             width: 1920,
             height: 1080,
